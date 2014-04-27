@@ -1,0 +1,7 @@
+call()
+
+other_module:func(Var, Var2)
+
+@resource:call(Other)
+
+@local_call(Test)

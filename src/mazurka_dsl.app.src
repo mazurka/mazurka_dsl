@@ -1,0 +1,9 @@
+{application, mazurka_dsl, [
+  {id, "mazurka_dsl"},
+  {description, "DSL for defining mazurka resources"},
+  {vsn, "0.1.0"},
+  {modules, []},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env, []}
+]}.
