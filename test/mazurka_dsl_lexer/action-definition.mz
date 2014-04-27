@@ -1,9 +1,12 @@
 
 action() ->
+  ok.
 
 testing(Var1, Var2) ->
+  ok.
 
 testing (Var1, Var2) ->
+  ok.
 
 read(PostID) ->
   #{
@@ -13,4 +16,4 @@ read(PostID) ->
     This is the length right here
     |#
     count => length(Favorites)
-  }
+  }.

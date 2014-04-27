@@ -34,17 +34,11 @@ resource[\s]+@{Atom}+               :  {token, #{type => resource,
 
 %% action
 
-%%% definition
-{Atom}\s*\(                         :  {token, #{type => action_def_begin,
-                                                 line => TokenLine,
-                                                 value => parse_action_def(TokenChars)}}.
-{Var}                               :  {token, #{type => variable,
-                                                 line => TokenLine,
-                                                 value => unicode(TokenChars)}}.
 \)\s*->                             :  {token, #{type => action_def_body,
                                                  line => TokenLine}}.
 
-\.                                  :  {token, #{type => action_def_end}}.
+\.                                  :  {token, #{type => action_def_end,
+                                                 line => TokenLine}}.
 
 %%% attribute
 \-\-                                :  {token, #{type => action_attribute,
@@ -64,16 +58,20 @@ resource[\s]+@{Atom}+               :  {token, #{type => resource,
 
 %%% function calls
 {Atom}\s*\(                         :  {token, #{type => call_begin,
-                                                 subtype => resource,
+                                                 subtype => fn,
                                                  line => TokenLine,
                                                  value => parse_fn_call(TokenChars)}}.
 {Atom}:{Atom}\s*\(                  :  {token, #{type => call_begin,
-                                                 subtype => resource,
+                                                 subtype => fn,
                                                  line => TokenLine,
                                                  value => parse_fn_call(TokenChars)}}.
 \)                                  :  {token, #{type => call_end,
                                                  line => TokenLine}}.
 
+%%% variables
+{Var}                               :  {token, #{type => variable,
+                                                 line => TokenLine,
+                                                 value => unicode(TokenChars)}}.
 %% datatypes
 
 %%% string
@@ -158,11 +156,6 @@ parse_string(Str) ->
   Len = byte_size(Bin) - 2,
   <<_, Content:Len/binary, _>> = Bin,
   Content.
-
-parse_action_def(Str) ->
-  Bin = unicode(Str),
-  [Name|_] = binary:split(Bin, <<"(">>),
-  trim(Name).
 
 parse_fn_call(Str) ->
   Bin = unicode(Str),

@@ -6,9 +6,9 @@
 -define(PASSES, [
   "set_filename",
   "docstring_merge",
+  "action_args",
   "fn_call",
   "map",
-  "action_args",
   "action_body",
   "action_attr_merge",
   "resource_def"
@@ -27,6 +27,8 @@ parse(Tokens, Opts, [Pass|Passes]) ->
   case Module:parse(Tokens, Opts) of
     {ok, Ast} ->
       parse(Ast, Opts, Passes);
+    {error, Reason} ->
+      {error, Reason, Module};
     Error ->
       Error
   end.

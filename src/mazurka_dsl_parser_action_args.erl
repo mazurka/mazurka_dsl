@@ -7,19 +7,21 @@ parse(Tokens, _Opts) ->
 
 scan([], Acc) ->
   {ok, lists:reverse(Acc)};
-scan([#{type := action_def_begin} = Action|Tokens], Acc) ->
+scan([#{type := call_begin} = Action|Tokens], Acc) ->
   case combine(Action#{args => []}, Tokens) of
     {ok, CombinedActions, Rest} ->
       scan(Rest, [CombinedActions|Acc]);
+    pass ->
+      scan(Tokens, [Action|Acc]);
     Error ->
       Error
   end;
 scan([Token|Tokens], Acc) ->
   scan(Tokens, [Token|Acc]).
 
-combine(#{args := Args} = Action, [#{type := action_def_body}|Tokens]) ->
-  {ok, Action#{args := lists:reverse(Args), type := action}, Tokens};
+combine(#{args := Args, value := {_, Name}} = Action, [#{type := action_def_body}|Tokens]) ->
+  {ok, Action#{args := lists:reverse(Args), type := action, value := Name}, Tokens};
 combine(#{args := Args} = Action, [#{type := variable, value := Var}|Tokens]) ->
   combine(Action#{args := [Var|Args]}, Tokens);
-combine(_, [Token|_]) ->
-  {error, {unexpected, Token}}.
+combine(_, [_|_]) ->
+  pass.

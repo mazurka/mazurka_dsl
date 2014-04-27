@@ -29,7 +29,7 @@ declare(Res, Tokens) ->
 
 combine(_, []) ->
   {error, {unexpected, 'EOF'}};
-combine(#{declarations := Defs} = Res, [#{type := call_end}|_] = Rest) ->
+combine(#{declarations := Defs} = Res, [#{type := call_end}|Rest]) ->
   {ok, Res#{declarations := lists:reverse(Defs)}, Rest};
 combine(#{declarations := Defs} = Res, [#{type := call_begin} = Begin|Tokens]) ->
   case declare(Begin, Tokens) of

@@ -35,4 +35,6 @@ parse(Test) ->
   end,
   {ok, Tokens, _} = mazurka_dsl_lexer:string(Src),
   {ok, AST} = mazurka_dsl_parser:parse(Tokens),
-  ?debugVal(AST).
+  {ok, CWD} = file:get_cwd(),
+  Out = filename:join(CWD, "../test.ast"),
+  file:write_file(Out, io_lib:format("~p~n", [AST])).

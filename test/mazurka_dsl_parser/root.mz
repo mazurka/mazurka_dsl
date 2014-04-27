@@ -5,6 +5,9 @@ resource @root
 
 test :: 123
 
+Val <- users:list()
+Val2 <- local(users:get(Val))
+
 #|
 This is the doc for the index action
 |#
