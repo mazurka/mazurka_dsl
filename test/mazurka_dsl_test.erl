@@ -17,8 +17,7 @@ lex(Test) ->
       binary_to_list(Bin)
   end,
   %% TODO verify tokens
-  {ok, _Tokens, _} = mazurka_dsl_lexer:string(Src),
-  ?debugVal(_Tokens).
+  {ok, _Tokens, _} = mazurka_dsl_lexer:string(Src).
 
 parser_test_() ->
   {ok, CWD} = file:get_cwd(),

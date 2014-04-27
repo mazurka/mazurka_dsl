@@ -1,0 +1,21 @@
+#|
+this is the root resource
+|#
+resource @root
+
+test :: 123
+
+#|
+This is the doc for the index action
+|#
+--main
+index() ->
+  #{
+
+  }.
+
+#|
+another docstring
+|#
+other(Val) ->
+  [].
