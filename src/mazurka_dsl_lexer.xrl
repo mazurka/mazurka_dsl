@@ -124,7 +124,7 @@ Erlang code.
 
 extract_resource(Str) ->
   <<"resource @", Name/binary>> = unicode(Str),
-  Name.
+  binary_to_atom(Name).
 
 unicode(Str) ->
   unicode:characters_to_binary(Str).
@@ -157,12 +157,14 @@ parse_string(Str) ->
   <<_, Content:Len/binary, _>> = Bin,
   Content.
 
+parse_fn_call([$@|Str]) ->
+  parse_fn_call(Str);
 parse_fn_call(Str) ->
   Bin = unicode(Str),
   [Name|_] = binary:split(Bin, <<"(">>),
   case binary:split(Name, <<":">>) of
-    [Mod,Fn] -> {Mod, Fn};
-    _ -> {'__local', Name}
+    [Mod,Fn] -> {binary_to_atom(Mod), binary_to_atom(Fn)};
+    _ -> {'__global', binary_to_atom(Name)}
   end.
 
 trim(<<$\s, Rest/binary>>) ->
@@ -183,3 +185,6 @@ trim(Bin) ->
     _ ->
       Bin
   end.
+
+binary_to_atom(Bin) ->
+  list_to_atom(binary_to_list(Bin)).

@@ -8,6 +8,8 @@ test :: 123
 Val <- users:list()
 Val2 <- local(users:get(Val))
 
+@user:get(Val2)
+
 #|
 This is the doc for the index action
 |#
