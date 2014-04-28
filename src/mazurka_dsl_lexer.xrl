@@ -25,97 +25,92 @@ Rules.
 %% resource
 
 %%% definition
-resource[\s]+@{Atom}+               :  {token, #{type => resource,
-                                                 line => TokenLine,
-                                                 value => extract_resource(TokenChars)}}.
+resource[\s]+@{Atom}+               :  {token, {def_begin,
+                                                TokenLine,
+                                                extract_resource(TokenChars),
+                                                resource}}.
 
 %%% attribute
 ([a-z]*)\s*::\s*(.*)                :  {token, split_attribute(TokenLine, TokenChars)}.
 
 %% action
 
-\)\s*->                             :  {token, #{type => action_def_body,
-                                                 line => TokenLine}}.
+\)\s*->                             :  {token, {action_def_body,
+                                                TokenLine}}.
 
-\.                                  :  {token, #{type => action_def_end,
-                                                 line => TokenLine}}.
+\.                                  :  {token, {def_end,
+                                                TokenLine}}.
 
 %%% attribute
-\-\-                                :  {token, #{type => action_attribute,
-                                                 line => TokenLine}}.
+\-\-                                :  {token, {attr_begin,
+                                                TokenLine}}.
 
 %% calls
 
 %%% resource calls
-@{Atom}\s*\(                        :  {token, #{type => call_begin,
-                                                 subtype => resource,
-                                                 line => TokenLine,
-                                                 value => parse_fn_call(TokenChars)}}.
-@{Atom}:{Atom}\s*\(                 :  {token, #{type => call_begin,
-                                                 subtype => resource,
-                                                 line => TokenLine,
-                                                 value => parse_fn_call(TokenChars)}}.
+@{Atom}\s*\(                        :  {token, {res_call_begin,
+                                                TokenLine,
+                                                parse_fn_call(TokenChars)}}.
+@{Atom}:{Atom}\s*\(                 :  {token, {res_call_begin,
+                                                TokenLine,
+                                                parse_fn_call(TokenChars)}}.
 
 %%% function calls
-{Atom}\s*\(                         :  {token, #{type => call_begin,
-                                                 subtype => fn,
-                                                 line => TokenLine,
-                                                 value => parse_fn_call(TokenChars)}}.
-{Atom}:{Atom}\s*\(                  :  {token, #{type => call_begin,
-                                                 subtype => fn,
-                                                 line => TokenLine,
-                                                 value => parse_fn_call(TokenChars)}}.
-\)                                  :  {token, #{type => call_end,
-                                                 line => TokenLine}}.
+{Atom}\s*\(                         :  {token, {call_begin,
+                                                TokenLine,
+                                                parse_fn_call(TokenChars)}}.
+{Atom}:{Atom}\s*\(                  :  {token, {call_begin,
+                                                TokenLine,
+                                                parse_fn_call(TokenChars)}}.
+\)                                  :  {token, {call_end,
+                                                TokenLine}}.
 
 %%% variables
-{Var}                               :  {token, #{type => variable,
-                                                 line => TokenLine,
-                                                 value => unicode(TokenChars)}}.
+{Var}                               :  {token, {variable,
+                                                TokenLine,
+                                                unicode(TokenChars)}}.
 %% datatypes
 
 %%% string
-\"[^\"]*\"                          :  {token, #{type => string,
-                                                 line => TokenLine,
-                                                 value => parse_string(TokenChars)}}.
-\'[^\']*\'                          :  {token, #{type => string,
-                                                 line => TokenLine,
-                                                 value => parse_string(TokenChars)}}.
+\"[^\"]*\"                          :  {token, {string,
+                                                TokenLine,
+                                                parse_string(TokenChars)}}.
+\'[^\']*\'                          :  {token, {string,
+                                                TokenLine,
+                                                parse_string(TokenChars)}}.
 
 %%% numbers
-{D}+                                :  {token, #{type => integer,
-                                                 line => TokenLine,
-                                                 value => list_to_integer(TokenChars)}}.
-{Float}                             :  {token, #{type => float,
-                                                 line => TokenLine,
-                                                 value => list_to_float(TokenChars)}}.
+{D}+                                :  {token, {integer,
+                                                TokenLine,
+                                                list_to_integer(TokenChars)}}.
+{Float}                             :  {token, {float,
+                                                TokenLine,
+                                                list_to_float(TokenChars)}}.
 
 %%% atom
-{Atom}                              :  {token, #{type => atom,
-                                                 line => TokenLine,
-                                                 value => list_to_atom(TokenChars)}}.
+{Atom}                              :  {token, {atom,
+                                                TokenLine,
+                                                list_to_atom(TokenChars)}}.
 
 %%% maps, tuples, lists
-#{                                  :  {token, #{type => map_begin,
-                                                 line => TokenLine}}.
-{                                   :  {token, #{type => tuple_begin,
-                                                 line => TokenLine}}.
-}                                   :  {token, #{type => map_or_tuple_end,
-                                                 line => TokenLine}}.
-\[                                  :  {token, #{type => list_begin,
-                                                 line => TokenLine}}.
-\]                                  :  {token, #{type => list_end,
-                                                 line => TokenLine}}.
+#{                                  :  {token, {map_begin,
+                                                TokenLine}}.
+{                                   :  {token, {tuple_begin,
+                                                TokenLine}}.
+}                                   :  {token, {map_or_tuple_end,
+                                                TokenLine}}.
+\[                                  :  {token, {list_begin,
+                                                TokenLine}}.
+\]                                  :  {token, {list_end,
+                                                TokenLine}}.
 
 %% control
-\|\|                                :  {token, #{type => comprehension,
-                                                 line => TokenLine}}.
-\|                                  :  {token, #{type => comprehension,
-                                                 line => TokenLine}}.
+(\|\||\|)                           :  {token, {comp_sep,
+                                                TokenLine}}.
 
-%% assignment
-(=\>?|<-)                           :  {token, #{type => assignment,
-                                                 line => TokenLine}}.
+%% assign
+(=\>?|<-)                           :  {token, {assign,
+                                                TokenLine}}.
 
 %%% whitespace
 {WS}                                : skip_token.
@@ -146,7 +141,7 @@ block_comment(TokenLine, TokenChars) ->
       Bin = unicode(TokenChars),
       Length = byte_size(Bin) - 2,
       <<Block:Length/binary, "|#">> = Bin,
-      {token, #{type => docstring, line => TokenLine, value => Block}};
+      {token, {docstring, TokenLine, Block}};
     _ ->
       {error, "illegal nested block comment"}
   end.

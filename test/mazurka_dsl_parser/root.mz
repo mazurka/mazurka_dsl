@@ -1,26 +1,55 @@
 #|
-this is the root resource
+Documentation for the @test resource
 |#
-resource @root
-
-test :: 123
-
-Val <- users:list()
-Val2 <- local(users:get(Val))
-
-@user:get(Val2)
+resource @test
 
 #|
-This is the doc for the index action
+assign 1 to Integer
 |#
---main
-index() ->
-  #{
-
-  }.
+--lazy.
+--other_attr.
+--timeout 1.34.
+Integer <- 1
 
 #|
-another docstring
+assign 3.14 to Float
 |#
-other(Val) ->
+Float <- 3.14
+
+#|
+docs for @other
+|#
+resource @other
+
+action() ->
+  Float <- 3.14
+  1.
+
+lists() ->
+  Lists <- [1, 2, 3]
   [].
+
+maps() ->
+  Map <- #{}
+  #{}.
+
+tuples() ->
+  Tuple <- {atom1 {3 5} 4.1}
+  {}.
+
+args(Var1, Var2) ->
+  ok.
+
+calls(Var3) ->
+  --attr inside_action.
+  Var4 <- users:get(Var3)
+  1.
+
+; comprehensions(Users) ->
+;   UserList <- [@user:get(User) || User <- Users]
+;   ok.
+
+; maps() ->
+;   #{
+;     key => value
+;   }.

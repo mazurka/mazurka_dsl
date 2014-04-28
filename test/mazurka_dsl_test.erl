@@ -34,7 +34,10 @@ parse(Test) ->
       binary_to_list(Bin)
   end,
   {ok, Tokens, _} = mazurka_dsl_lexer:string(Src),
-  {ok, AST} = mazurka_dsl_parser:parse(Tokens),
+  {ok, Tokens2} = mazurka_dsl_parser_utils:insert_def_end(Tokens),
+  io:format("~p~n", [Tokens2]),
+
+  {ok, AST} = mazurka_dsl_parser:parse(Tokens2),
   {ok, CWD} = file:get_cwd(),
   Out = filename:join(CWD, "../test.ast"),
   file:write_file(Out, io_lib:format("~p~n", [AST])).
