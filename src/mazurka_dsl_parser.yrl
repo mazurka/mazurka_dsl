@@ -4,6 +4,7 @@ defs def def_
 
 statements statement
 assignments assignment assignment_
+kvs kv kv_
 action action_body action_
 
 attrs attr
@@ -172,6 +173,14 @@ expr_val -> float : to_map('$1').
 expr_val -> atom : to_map('$1').
 expr_val -> variable : to_map('$1').
 
+%%% comprehensions
+
+expr_val -> comprehension : '$1'.
+
+comprehension ->
+  list_begin expr comp_sep assignment :
+  comprehension.
+
 %% lists
 expr_val ->
   list_begin list_end :
@@ -213,6 +222,26 @@ expr_val ->
   }.
 
 %% maps
+%%%% KVs
+
+kvs -> kv : ['$1'].
+kvs -> kv kvs : ['$1' | '$2'].
+
+kv -> kv_ : '$1'.
+kv -> attrs kv_ : set_attrs('$2', '$1').
+kv -> docstring kv_ : set_doc('$2', '$1').
+kv -> docstring attrs kv_ : set_attrs(set_doc('$3', '$1'), '$2').
+
+kv_ ->
+  atom assign expr :
+  #{
+    type => assignment,
+    value => ?value('$1'),
+    children => #{
+      expressions => ['$3']
+    }
+  }.
+
 expr_val ->
   map_begin map_or_tuple_end :
   #{
@@ -221,9 +250,9 @@ expr_val ->
     children => #{}
   }.
 expr_val ->
-  map_begin assignments map_or_tuple_end :
+  map_begin kvs map_or_tuple_end :
   #{
-    type => list,
+    type => map,
     line => ?line('$1'),
     children => '$2'
   }.
@@ -240,14 +269,6 @@ call -> call_begin call_end :  call_body('$1', [], fn).
 call -> res_call_begin exprs call_end : call_body('$1', '$2', resource).
 %% resource call with no arguments
 call -> res_call_begin call_end : call_body('$1', [], resource).
-
-%%% comprehensions
-
-expr_val -> comprehension : '$1'.
-
-comprehension ->
-  list_begin expr comp_sep assignment :
-  comprehension.
 
 Erlang code.
 

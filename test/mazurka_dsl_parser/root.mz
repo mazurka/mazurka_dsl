@@ -49,7 +49,17 @@ calls(Var3) ->
 ;   UserList <- [@user:get(User) || User <- Users]
 ;   ok.
 
-; maps() ->
-;   #{
-;     key => value
-;   }.
+maps() ->
+  #{
+    key <- value
+    --attr can_go_here.
+    nested <- #{
+      #|
+      as well as a doc string
+      |#
+      --other attr.
+      real <- #{
+        deep <- users:get(#{})
+      }
+    }
+  }.
