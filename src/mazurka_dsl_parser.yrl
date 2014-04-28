@@ -13,7 +13,6 @@ exprs expr expr_val
 arguments
 call
 comprehension
-
 .
 
 Terminals
@@ -146,29 +145,30 @@ expr_val -> variable : to_map('$1').
 expr_val -> comprehension : '$1'.
 
 comprehension ->
-  list_begin expr comp_sep assignment list_end :
+  list_begin action_body comp_sep assignment list_end :
   #{
     type => comprehension,
     line => ?line('$1'),
     children => #{
       assignments => ['$4'],
-      expressions => ['$2']
+      expressions => '$2'
     }
   }.
 
 comprehension ->
-  list_begin expr comp_sep assignment expr list_end :
+  list_begin action_body comp_sep assignment exprs list_end :
   #{
     type => comprehension,
     line => ?line('$1'),
     children => #{
       assignments => ['$4'],
-      expressions => ['$2'],
-      filters => ['$5']
+      expressions => '$2',
+      filters => '$5'
     }
   }.
 
-%% lists
+%%% lists
+
 expr_val ->
   list_begin list_end :
   #{
@@ -188,7 +188,8 @@ expr_val ->
     }
   }.
 
-%% tuples
+%%% tuples
+
 expr_val ->
   tuple_begin map_or_tuple_end :
   #{
@@ -208,7 +209,7 @@ expr_val ->
     }
   }.
 
-%% maps
+%%% maps
 
 expr_val ->
   map_begin map_or_tuple_end :
@@ -238,7 +239,7 @@ kv -> docstring attrs kv_ : set_attrs(set_doc('$3', '$1'), '$2').
 kv_ ->
   atom assign expr :
   #{
-    type => assignment,
+    type => kv,
     value => ?value('$1'),
     children => #{
       expressions => ['$3']
@@ -249,13 +250,13 @@ kv_ ->
 
 expr_val -> call : '$1'.
 
-%% call with arguments
+%%%% call with arguments
 call -> call_begin exprs call_end : call_body('$1', '$2', fn).
-%% call with no arguments
+%%%% call with no arguments
 call -> call_begin call_end : call_body('$1', [], fn).
-%% resource call with arguments
+%%%% resource call with arguments
 call -> res_call_begin exprs call_end : call_body('$1', '$2', resource).
-%% resource call with no arguments
+%%%% resource call with no arguments
 call -> res_call_begin call_end : call_body('$1', [], resource).
 
 Erlang code.
@@ -283,9 +284,10 @@ def_body(Def, Statements) ->
   }.
 
 action_body(Action, Args, Statements) ->
+  {_, Name} = ?value(Action),
   #{
     type => action,
-    value => ?value(Action),
+    value => Name,
     children => #{
       statements => Statements,
       arguments => Args

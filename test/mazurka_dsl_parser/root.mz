@@ -48,7 +48,11 @@ calls(Var3) ->
 comprehensions(Users) ->
   UserList <- [@user:get(User) || User <- Users]
   FilteredList <- [@user:get(User) || User <- Users, users:filter(User)]
-  ok.
+  [
+    Var1 <- test:call()
+    Var2 <- test:call(Var1)
+    test:call(Var2) || User <- Users, users:filter(User), user:filter2(User)
+  ].
 
 ;; TODO fix this
 ; return_with_var() ->
