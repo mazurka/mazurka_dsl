@@ -178,8 +178,27 @@ expr_val -> variable : to_map('$1').
 expr_val -> comprehension : '$1'.
 
 comprehension ->
-  list_begin expr comp_sep assignment :
-  comprehension.
+  list_begin expr comp_sep assignment list_end :
+  #{
+    type => comprehension,
+    line => ?line('$1'),
+    children => #{
+      assignments => ['$4'],
+      expressions => ['$2']
+    }
+  }.
+
+comprehension ->
+  list_begin expr comp_sep assignment expr list_end :
+  #{
+    type => comprehension,
+    line => ?line('$1'),
+    children => #{
+      assignments => ['$4'],
+      expressions => ['$2'],
+      filters => ['$5']
+    }
+  }.
 
 %% lists
 expr_val ->
