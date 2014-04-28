@@ -56,23 +56,8 @@ defs -> def defs : ['$1' | '$2'].
 def -> docstring def_ : set_doc('$2', '$1').
 def -> def_ : '$1'.
 
-def_ -> def_begin def_end :
-  #{
-    type => element(4, '$1'),
-    value => ?value('$1'),
-    children => #{
-      statements => []
-    }
-  }.
-
-def_ -> def_begin statements def_end :
- #{
-    type => element(4, '$1'),
-    value => ?value('$1'),
-    children => #{
-      statements => '$2'
-    }
-  }.
+def_ -> def_begin def_end : def_body('$1', []).
+def_ -> def_begin statements def_end : def_body('$1', '$2').
 
 %%% statements
 
@@ -92,8 +77,7 @@ assignment -> attrs assignment_ : set_attrs('$2', '$1').
 assignment -> docstring assignment_ : set_doc('$2', '$1').
 assignment -> docstring attrs assignment_ : set_attrs(set_doc('$3', '$1'), '$2').
 
-assignment_ ->
-  variable assign expr :
+assignment_ -> variable assign expr :
   #{
     type => assignment,
     value => ?value('$1'),
@@ -109,26 +93,8 @@ action -> attrs action_ : set_attrs('$2', '$1').
 action -> docstring action_ : set_doc('$2', '$1').
 action -> docstring attrs action_ : set_attrs(set_doc('$3', '$1'), '$2').
 
-action_ ->
-  call_begin action_def_body action_body def_end :
-  #{
-    type => action,
-    value => ?value('$1'),
-    children => #{
-      arguments => [],
-      statements => ['$3']
-    }
-  }.
-action_ ->
-  call_begin arguments action_def_body action_body def_end :
-  #{
-    type => action,
-    value => ?value('$1'),
-    children => #{
-      statements => ['$4'],
-      arguments => '$2'
-    }
-  }.
+action_ -> call_begin action_def_body action_body def_end : action_body('$1', [], '$3').
+action_ -> call_begin arguments action_def_body action_body def_end : action_body('$1', '$2', '$4').
 
 action_body -> assignments expr : '$1' ++ ['$2'].
 action_body -> expr : ['$1'].
@@ -166,7 +132,9 @@ exprs -> expr : ['$1'].
 exprs -> expr exprs : ['$1' | '$2'].
 
 expr -> expr_val : '$1'.
+expr -> attrs expr_val :  set_attrs('$2', '$1').
 expr -> docstring expr_val : set_doc('$2', '$1').
+expr -> docstring attrs expr_val : set_attrs(set_doc('$3', '$1'), '$2').
 
 expr_val -> integer : to_map('$1').
 expr_val -> float : to_map('$1').
@@ -241,6 +209,22 @@ expr_val ->
   }.
 
 %% maps
+
+expr_val ->
+  map_begin map_or_tuple_end :
+  #{
+    type => map,
+    line => ?line('$1'),
+    children => #{}
+  }.
+expr_val ->
+  map_begin kvs map_or_tuple_end :
+  #{
+    type => map,
+    line => ?line('$1'),
+    children => '$2'
+  }.
+
 %%%% KVs
 
 kvs -> kv : ['$1'].
@@ -261,29 +245,14 @@ kv_ ->
     }
   }.
 
-expr_val ->
-  map_begin map_or_tuple_end :
-  #{
-    type => map,
-    line => ?line('$1'),
-    children => #{}
-  }.
-expr_val ->
-  map_begin kvs map_or_tuple_end :
-  #{
-    type => map,
-    line => ?line('$1'),
-    children => '$2'
-  }.
+%%% calls
 
 expr_val -> call : '$1'.
 
-%%% calls
-
 %% call with arguments
-call -> call_begin exprs call_end :  call_body('$1', '$2', fn).
+call -> call_begin exprs call_end : call_body('$1', '$2', fn).
 %% call with no arguments
-call -> call_begin call_end :  call_body('$1', [], fn).
+call -> call_begin call_end : call_body('$1', [], fn).
 %% resource call with arguments
 call -> res_call_begin exprs call_end : call_body('$1', '$2', resource).
 %% resource call with no arguments
@@ -303,6 +272,25 @@ set_attrs(Thing, Attrs) ->
 
 to_map({Type, Line, Value}) ->
   #{type => Type, line => Line, value => Value}.
+
+def_body(Def, Statements) ->
+  #{
+    type => element(4, Def),
+    value => ?value(Def),
+    children => #{
+      statements => Statements
+    }
+  }.
+
+action_body(Action, Args, Statements) ->
+  #{
+    type => action,
+    value => ?value(Action),
+    children => #{
+      statements => Statements,
+      arguments => Args
+    }
+  }.
 
 call_body(Call, Args, Type) ->
   #{type => call,

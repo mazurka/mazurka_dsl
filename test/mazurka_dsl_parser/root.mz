@@ -56,7 +56,10 @@ comprehensions(Users) ->
 ;   Var.
 
 maps() ->
+  --prop here.
+  --another here.
   #{
+    --condition users:can_view(key).
     key <- value
     --attr can_go_here.
     nested <- #{
