@@ -33,6 +33,7 @@ call_end
 integer
 atom
 float
+string
 list_begin
 list_end
 map_begin
@@ -95,8 +96,8 @@ action -> docstring attrs action_ : set_attrs(set_doc('$3', '$1'), '$2').
 action_ -> call_begin action_def_body action_body def_end : action_body('$1', [], '$3').
 action_ -> call_begin arguments action_def_body action_body def_end : action_body('$1', '$2', '$4').
 
-action_body -> assignments expr : '$1' ++ ['$2'].
-action_body -> expr : ['$1'].
+action_body -> assignments exprs : '$1' ++ ['$2'].
+action_body -> exprs : ['$1'].
 
 %%% attributes
 
@@ -139,6 +140,7 @@ expr_val -> integer : to_map('$1').
 expr_val -> float : to_map('$1').
 expr_val -> atom : to_map('$1').
 expr_val -> variable : to_map('$1').
+expr_val -> string : to_map('$1').
 
 %%% comprehensions
 

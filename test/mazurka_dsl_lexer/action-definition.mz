@@ -10,10 +10,10 @@ testing (Var1, Var2) ->
 
 read(PostID) ->
   #{
-    favorites => [@users:read(Favorite) || Favorite <- Favorites]
+    favorites <- [@users:read(Favorite) || Favorite <- Favorites]
 
     #|
     This is the length right here
     |#
-    count => length(Favorites)
+    count <- length(Favorites)
   }.

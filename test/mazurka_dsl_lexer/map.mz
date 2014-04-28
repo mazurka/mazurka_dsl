@@ -1,17 +1,17 @@
 #{
-  key => []
+  key <- []
 
-  other_key => 123
+  other_key <- 123
 
-  other   =>      atom123
+  other   <-      atom123
 }
 
 #{}
 
 #{
-  nested => #{
-    key => #{
-      123 => #{
+  nested <- #{
+    key <- #{
+      123 <- #{
 
       }
     }

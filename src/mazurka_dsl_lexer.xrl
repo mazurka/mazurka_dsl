@@ -42,7 +42,7 @@ resource[\s]+@{Atom}+               :  {token, {def_begin,
                                                 TokenLine}}.
 
 %%% attribute
-\-\-                                :  {token, {attr_begin,
+\-\s?                               :  {token, {attr_begin,
                                                 TokenLine}}.
 
 %% calls
@@ -109,11 +109,11 @@ resource[\s]+@{Atom}+               :  {token, {def_begin,
                                                 TokenLine}}.
 
 %% assign
-(=\>?|<-)                           :  {token, {assign,
+<-                                  :  {token, {assign,
                                                 TokenLine}}.
 
 %%% whitespace
-{WS}                                : skip_token.
+{WS}                                :  skip_token.
 
 Erlang code.
 

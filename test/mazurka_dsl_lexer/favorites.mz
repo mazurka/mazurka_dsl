@@ -15,40 +15,40 @@ Favorites <- favorites:list(PostID)
 #|
 provides @favorites data and actions for a @post
 |#
---main
+- main.
 read(PostID) ->
   #{
     #|
     collection of @users that have favorited the @post
     |#
-    favorites => [@users:read(Favorite) | Favorite <- Favorites]
+    favorites <- [@users:read(Favorite) | Favorite <- Favorites]
 
     #|
     total length of @users the have favorited the @post
     |#
-    count => length(Favorites)
+    count <- length(Favorites)
 
-    post => @posts:read(PostID)
-    favorite => @favorite(PostID)
-    unfavorite => @unfavorite(PostID)
-  }
+    post <- @posts:read(PostID)
+    favorite <- @favorite(PostID)
+    unfavorite <- @unfavorite(PostID)
+  }.
 
 #|
 adds the @user to the list of @favorites for a @post
 |#
---condition in('favorite', Auth/Scopes)
---condition not(in(Auth/OwnerID, Favorites))
---type unsafe
+- condition in('favorite', Auth/Scopes).
+- condition not(in(Auth/OwnerID, Favorites)).
+- type unsafe.
 favorite(PostID) ->
   _Result <- favorites:add(PostID, Auth/OwnerID)
-  read(PostID)
+  read(PostID).
 
 #|
 removes the @user from the list of @favorites for a @post
 |#
---condition in('favorite', Auth/Scopes)
---condition in(Auth/OwnerID, Favorites)
---type unsafe
+- condition in('favorite', Auth/Scopes).
+- condition in(Auth/OwnerID, Favorites).
+- type unsafe.
 unfavorite(PostID) ->
   _Result <- favorites:remove(PostID, Auth/OwnerID)
-  read(PostID)
+  read(PostID).
