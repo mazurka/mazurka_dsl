@@ -34,7 +34,7 @@ read(UserID) ->
     followers <- @followers:list(UserID)
     following <- @following:list(UserID)
     update <- @update(UserID)
-    remove <- @update(UserID)
+    remove <- @remove(UserID)
   }.
 
 - condition is(UserID Auth/OwnerID).

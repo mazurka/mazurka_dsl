@@ -228,7 +228,7 @@ expr_val ->
   #{
     type => map,
     line => ?line('$1'),
-    children => '$2'
+    children => format_kvs('$2', #{})
   }.
 
 %%%% KVs
@@ -246,9 +246,7 @@ kv_ ->
   #{
     type => kv,
     value => ?value('$1'),
-    children => #{
-      expressions => ['$3']
-    }
+    expression => '$3'
   }.
 
 %%% calls
@@ -307,3 +305,9 @@ call_body(Call, Args, Type) ->
     declarations => #{
       arguments => Args
     }}.
+
+format_kvs([], Map) ->
+  Map;
+format_kvs([#{value := Key, expression := Expr}|KVs], Map) ->
+  Map2 = maps:put(Key, [Expr], Map),
+  format_kvs(KVs, Map2).
