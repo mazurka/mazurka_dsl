@@ -1,81 +1,11 @@
 #|
-Documentation for the @test resource
+Documentation for the @root resource
 |#
-resource @test
+resource @root
 
-#|
-assign 1 to Integer
-|#
-- lazy.
-- other_attr.
-- timeout 1.34.
-Integer <- 1
-
-#|
-assign 3.14 to Float
-|#
-Float <- 3.14
-
-#|
-docs for @other
-|#
-resource @other
-
-action() ->
-  Float <- 3.14
-  1.
-
-lists() ->
-  Lists <- [1, 2, 3]
-  [].
-
-strings() ->
-  String <- 'this is a string'
-  Unicode <- '☃ unicode!'
-  "here's another string".
-
-tuples() ->
-  Tuple <- {atom1 {3 5} 4.1}
-  {}.
-
-args(Var1, Var2) ->
-  ok.
-
-calls(Var3) ->
-  - attr inside_action.
-  Var4 <- users:get({Var3, [foo:bar()]})
-  1.
-
-comprehensions(Users) ->
-  UserList <- [@user:get(User) || User <- Users]
-  FilteredList <- [@user:get(User) || User <- Users, users:filter(User)]
-  [
-    Var1 <- test:call(User)
-    Var2 <- test:call(Var1)
-    test:call(Var2) || User <- Users, users:filter(User), user:filter2(User)
-  ].
-
-;; TODO fix this
-; return_with_var() ->
-;   Var <- users:list()
-;   Var.
-
-- other here.
-maps() ->
-  - prop here.
-  - another here.
+index() ->
   #{
-    - condition users:can_view(key).
-    key <- users:expensive_call()
-
-    - attr can_go_here.
-    nested <- #{
-      #|
-      as well as a doc string
-      |#
-      - other attr.
-      real <- #{
-        deep <- users:get(#{})
-      }
-    }
+    account <- @users:read(Auth/OwnerID)
+    feeds <- @feeds:list()
+    post <- @posts:post()
   }.

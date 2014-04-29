@@ -5,7 +5,7 @@ defs def def_
 statements statement
 assignments assignment assignment_
 kvs kv kv_
-action action_body action_
+action action_ action_body action_body_
 
 attrs attr
 
@@ -96,8 +96,11 @@ action -> docstring attrs action_ : set_attrs(set_doc('$3', '$1'), '$2').
 action_ -> call_begin action_def_body action_body def_end : action_body('$1', [], '$3').
 action_ -> call_begin arguments action_def_body action_body def_end : action_body('$1', '$2', '$4').
 
-action_body -> assignments exprs : '$1' ++ ['$2'].
-action_body -> exprs : ['$1'].
+action_body -> action_body_ : ['$1'].
+action_body -> action_body_ action_body : ['$1' | '$2'].
+
+action_body_ -> expr : '$1'.
+action_body_ -> assignment : '$1'.
 
 %%% attributes
 
