@@ -3,7 +3,7 @@ Nonterminals
 defs def def_
 
 statements statement
-assignments assignment assignment_
+assignment assignment_
 kvs kv kv_
 action action_ action_body action_body_
 
@@ -28,8 +28,8 @@ action_def_body
 
 %% exprs
 call_begin
-res_call_begin
-call_end
+affordance_begin
+call_or_affordance_end
 integer
 atom
 float
@@ -53,8 +53,10 @@ Rootsymbol defs.
 defs -> def : ['$1'].
 defs -> def defs : ['$1' | '$2'].
 
-def -> docstring def_ : set_doc('$2', '$1').
 def -> def_ : '$1'.
+def -> docstring def_ : set_doc('$2', '$1').
+def -> attrs def_ : set_attrs('$2', '$1').
+def -> docstring attrs def_ : set_attrs(set_doc('$3', '$1'), '$2').
 
 def_ -> def_begin def_end : def_body('$1', []).
 def_ -> def_begin statements def_end : def_body('$1', '$2').
@@ -68,9 +70,6 @@ statement -> assignment : '$1'.
 statement -> action : '$1'.
 
 %%%% assignments
-
-assignments -> assignment : ['$1'].
-assignments -> assignment assignments : ['$1' | '$2'].
 
 assignment -> assignment_ : '$1'.
 assignment -> attrs assignment_ : set_attrs('$2', '$1').
@@ -150,25 +149,13 @@ expr_val -> string : to_map('$1').
 expr_val -> comprehension : '$1'.
 
 comprehension ->
-  list_begin action_body comp_sep assignment list_end :
+  list_begin expr comp_sep assignment list_end :
   #{
     type => comprehension,
     line => ?line('$1'),
     children => #{
-      assignments => ['$4'],
-      expressions => '$2'
-    }
-  }.
-
-comprehension ->
-  list_begin action_body comp_sep assignment exprs list_end :
-  #{
-    type => comprehension,
-    line => ?line('$1'),
-    children => #{
-      assignments => ['$4'],
-      expressions => '$2',
-      filters => '$5'
+      assignment => '$4',
+      expression => '$2'
     }
   }.
 
@@ -179,18 +166,14 @@ expr_val ->
   #{
     type => list,
     line => ?line('$1'),
-    children => #{
-      values => []
-    }
+    children => #{}
   }.
 expr_val ->
   list_begin exprs list_end :
   #{
     type => list,
     line => ?line('$1'),
-    children => #{
-      values => '$2'
-    }
+    children => list_to_map('$2')
   }.
 
 %%% tuples
@@ -200,18 +183,14 @@ expr_val ->
   #{
     type => tuple,
     line => ?line('$1'),
-    children => #{
-      values => []
-    }
+    children => #{}
   }.
 expr_val ->
   tuple_begin exprs map_or_tuple_end :
   #{
     type => tuple,
     line => ?line('$1'),
-    children => #{
-      values => '$2'
-    }
+    children => list_to_map('$2')
   }.
 
 %%% maps
@@ -254,13 +233,13 @@ kv_ ->
 expr_val -> call : '$1'.
 
 %%%% call with arguments
-call -> call_begin exprs call_end : call_body('$1', '$2', fn).
+call -> call_begin exprs call_or_affordance_end : call_body('$1', '$2', call).
 %%%% call with no arguments
-call -> call_begin call_end : call_body('$1', [], fn).
+call -> call_begin call_or_affordance_end : call_body('$1', [], call).
 %%%% resource call with arguments
-call -> res_call_begin exprs call_end : call_body('$1', '$2', resource).
+call -> affordance_begin exprs call_or_affordance_end : call_body('$1', '$2', affordance).
 %%%% resource call with no arguments
-call -> res_call_begin call_end : call_body('$1', [], resource).
+call -> affordance_begin call_or_affordance_end : call_body('$1', [], affordance).
 
 Erlang code.
 
@@ -272,7 +251,7 @@ set_doc(Thing, Doc) ->
   Thing#{doc => ?value(Doc)}.
 
 set_attrs(Thing, Attrs) ->
-  Thing#{attrs => Attrs}.
+  Thing#{attrs => list_to_map(Attrs)}.
 
 to_map({Type, Line, Value}) ->
   #{type => Type, line => Line, value => Value}.
@@ -281,33 +260,37 @@ def_body(Def, Statements) ->
   #{
     type => element(4, Def),
     value => ?value(Def),
-    children => #{
-      statements => Statements
-    }
+    line => ?line(Def),
+    children => list_to_map(Statements)
   }.
 
 action_body(Action, Args, Statements) ->
-  {_, Name} = ?value(Action),
   #{
     type => action,
-    value => Name,
-    children => #{
-      statements => Statements,
-      arguments => Args
-    }
+    value => ?value(Action),
+    line => ?line(Action),
+    arguments => list_to_map(Args),
+    children => list_to_map(Statements)
   }.
 
 call_body(Call, Args, Type) ->
-  #{type => call,
-    subtype => Type,
+  #{
+    type => Type,
     line => ?line(Call),
     value => ?value(Call),
-    declarations => #{
-      arguments => Args
-    }}.
+    children => list_to_map(Args)
+  }.
 
 format_kvs([], Map) ->
   Map;
 format_kvs([#{value := Key, expression := Expr}|KVs], Map) ->
-  Map2 = maps:put(Key, [Expr], Map),
+  Map2 = maps:put(Key, Expr, Map),
   format_kvs(KVs, Map2).
+
+list_to_map(List) ->
+  list_to_map(lists:reverse(List), #{}).
+list_to_map([], Acc) ->
+  Acc;
+list_to_map([V|Rest], Acc) ->
+  Acc2 = maps:put(length(Rest), V, Acc),
+  list_to_map(Rest, Acc2).

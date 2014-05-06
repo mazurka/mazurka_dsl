@@ -45,17 +45,17 @@ read(UserID) ->
 
 Users <- users:list()
 
-"""
+#|
 assign
-"""
+|#
 UsersObjs <- [
   - concurrency 10.
-  users:get(UserID) || UserID <- Users]
+  users:get(UserID) | UserID <- Users]
 
 
-"""
+#|
 Update function here action
-"""
+|#
 - condition is(UserID Auth/OwnerID).
 - condition in('account.remove' Auth/Scopes).
 - idempotent.
@@ -63,9 +63,9 @@ Update function here action
 - param EmailParam.
 update(UserID Name Email) ->
   _Res <- users:update(UserID Name Email)
-  """
+  #|
   adsflkjasdflk
-  """
+  |#
   - attr.
   @read(UserID).
 
