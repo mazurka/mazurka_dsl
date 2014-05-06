@@ -2,6 +2,8 @@ call()
 
 other_module:func(Var, Var2)
 
+whitespace(Var Var2 Var3)
+
 @resource:call(Other)
 
 @local_call(Test)

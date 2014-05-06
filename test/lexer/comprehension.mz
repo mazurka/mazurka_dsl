@@ -1,0 +1,3 @@
+[Var | Var <- Vars]
+
+[mod:fn(Var1) | Var1 <- OtherVars]

@@ -82,7 +82,7 @@ assignment_ -> variable assign expr :
     type => assignment,
     value => ?value('$1'),
     children => #{
-      expressions => ['$3']
+      0 => '$3'
     }
   }.
 
@@ -120,7 +120,7 @@ attr ->
     type => attr,
     value => ?value('$2'),
     children => #{
-      expressions => ['$3']
+      0 => '$3'
     }
   }.
 

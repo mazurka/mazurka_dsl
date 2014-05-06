@@ -3,10 +3,9 @@ PROJECT = mazurka_dsl
 include erlang.mk
 
 # noop
-test: .eunit
-	@touch erlang.mk
+test: all eunit
 
-.eunit: ebin/*.beam test/mazurka_dsl_test.erl test/mazurka_dsl_lexer/*.mz test/mazurka_dsl_parser/*.mz
+eunit:
 	@rebar eunit
 
 .PHONY: eunit

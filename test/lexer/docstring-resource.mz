@@ -1,0 +1,4 @@
+#|
+resource @testing is a collection of @users
+|#
+resource @testing

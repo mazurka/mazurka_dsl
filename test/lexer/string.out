@@ -1,0 +1,2 @@
+{string,1,<<"this is a string">>}.
+{string,3,<<"\nmultiline\n\nstring\n">>}.

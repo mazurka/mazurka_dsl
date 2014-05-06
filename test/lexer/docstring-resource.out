@@ -1,0 +1,2 @@
+{docstring,1,<<"\nresource @testing is a collection of @users\n">>}.
+{def_begin,4,testing,resource}.

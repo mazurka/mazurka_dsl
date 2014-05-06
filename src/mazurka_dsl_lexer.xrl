@@ -19,6 +19,8 @@ Rules.
 %%% docstring
 #\|[^\|]*\|+([^#\|][^\|]*\|+)*#     :  block_comment(TokenLine, string:substr(TokenChars, 3)).
 
+%%% TODO get this working \"{3}([^\"{3}]|\n\r)*\"{3}
+
 %%% comment
 [;]+.*                              :  skip_token.
 
@@ -47,11 +49,11 @@ resource[\s]+@{Atom}+               :  {token, {def_begin,
 
 %% calls
 
-%%% resource calls
-@{Atom}\s*\(                        :  {token, {res_call_begin,
+%%% affordance calls
+@{Atom}\s*\(                        :  {token, {affordance_begin,
                                                 TokenLine,
                                                 parse_fn_call(TokenChars)}}.
-@{Atom}:{Atom}\s*\(                 :  {token, {res_call_begin,
+@{Atom}:{Atom}\s*\(                 :  {token, {affordance_begin,
                                                 TokenLine,
                                                 parse_fn_call(TokenChars)}}.
 
@@ -62,20 +64,20 @@ resource[\s]+@{Atom}+               :  {token, {def_begin,
 {Atom}:{Atom}\s*\(                  :  {token, {call_begin,
                                                 TokenLine,
                                                 parse_fn_call(TokenChars)}}.
-\)                                  :  {token, {call_end,
+\)                                  :  {token, {call_or_affordance_end,
                                                 TokenLine}}.
 
 %%% variables
 {Var}                               :  {token, {variable,
                                                 TokenLine,
-                                                unicode(TokenChars)}}.
+                                                binary_to_atom(unicode(TokenChars))}}.
 %% datatypes
 
 %%% string
 \"[^\"]*\"                          :  {token, {string,
                                                 TokenLine,
                                                 parse_string(TokenChars)}}.
-\'[^\']*\'                          :  {token, {string,
+\'[^\']*\'                          :  {token, {atom,
                                                 TokenLine,
                                                 parse_string(TokenChars)}}.
 
@@ -105,7 +107,7 @@ resource[\s]+@{Atom}+               :  {token, {def_begin,
                                                 TokenLine}}.
 
 %% control
-(\|\||\|)                           :  {token, {comp_sep,
+\|                                  :  {token, {comp_sep,
                                                 TokenLine}}.
 
 %% assign
@@ -158,8 +160,8 @@ parse_fn_call(Str) ->
   Bin = unicode(Str),
   [Name|_] = binary:split(Bin, <<"(">>),
   case binary:split(Name, <<":">>) of
-    [Mod,Fn] -> {binary_to_atom(Mod), binary_to_atom(Fn)};
-    _ -> {'__global', binary_to_atom(Name)}
+    [Mod,Fn] -> {binary_to_atom(trim(Mod)), binary_to_atom(trim(Fn))};
+    _ -> binary_to_atom(trim(Name))
   end.
 
 trim(<<$\s, Rest/binary>>) ->

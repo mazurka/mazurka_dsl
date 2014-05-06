@@ -1,3 +1,8 @@
+#|
+adsfkl;jasdf
+|#
+- asdfkljsadf.
+- asdf.
 resource @users
 
 User <- users:get(UserID)
@@ -37,6 +42,20 @@ read(UserID) ->
     remove <- @remove(UserID)
   }.
 
+
+Users <- users:list()
+
+"""
+assign
+"""
+UsersObjs <- [
+  - concurrency 10.
+  users:get(UserID) || UserID <- Users]
+
+
+"""
+Update function here action
+"""
 - condition is(UserID Auth/OwnerID).
 - condition in('account.remove' Auth/Scopes).
 - idempotent.
@@ -44,6 +63,10 @@ read(UserID) ->
 - param EmailParam.
 update(UserID Name Email) ->
   _Res <- users:update(UserID Name Email)
+  """
+  adsflkjasdflk
+  """
+  - attr.
   @read(UserID).
 
 - condition is(UserID Auth/OwnerID).

@@ -1,0 +1,16 @@
+{list_begin,1}.
+{variable,1,'Var'}.
+{comp_sep,1}.
+{variable,1,'Var'}.
+{assign,1}.
+{variable,1,'Vars'}.
+{list_end,1}.
+{list_begin,3}.
+{call_begin,3,{mod,fn}}.
+{variable,3,'Var1'}.
+{call_or_affordance_end,3}.
+{comp_sep,3}.
+{variable,3,'Var1'}.
+{assign,3}.
+{variable,3,'OtherVars'}.
+{list_end,3}.

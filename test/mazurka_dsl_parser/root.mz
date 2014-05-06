@@ -1,6 +1,6 @@
-#|
+"""
 Documentation for the @root resource
-|#
+"""
 resource @root
 
 index() ->

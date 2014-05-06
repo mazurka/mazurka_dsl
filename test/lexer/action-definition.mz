@@ -2,10 +2,10 @@
 action() ->
   ok.
 
-testing(Var1, Var2) ->
+testing(Var1 Var2) ->
   ok.
 
-testing (Var1, Var2) ->
+testing123 (Var1 Var2) ->
   ok.
 
 read(PostID) ->
