@@ -125,8 +125,8 @@ attr ->
 
 %%% arguments
 
-arguments -> variable : [to_map('$1')].
-arguments -> variable arguments : [to_map('$1') | '$2'].
+arguments -> variable : [to_map('$1', variable)].
+arguments -> variable arguments : [to_map('$1', variable) | '$2'].
 
 %%% exprs
 
@@ -138,11 +138,11 @@ expr -> attrs expr_val :  set_attrs('$2', '$1').
 expr -> docstring expr_val : set_doc('$2', '$1').
 expr -> docstring attrs expr_val : set_attrs(set_doc('$3', '$1'), '$2').
 
-expr_val -> integer : to_map('$1').
-expr_val -> float : to_map('$1').
-expr_val -> atom : to_map('$1').
-expr_val -> variable : to_map('$1').
-expr_val -> string : to_map('$1').
+expr_val -> integer : to_map('$1', literal).
+expr_val -> float : to_map('$1', literal).
+expr_val -> atom : to_map('$1', literal).
+expr_val -> variable : to_map('$1', variable).
+expr_val -> string : to_map('$1', literal).
 
 %%% comprehensions
 
@@ -253,7 +253,7 @@ set_doc(Thing, Doc) ->
 set_attrs(Thing, Attrs) ->
   Thing#{attrs => list_to_map(Attrs)}.
 
-to_map({Type, Line, Value}) ->
+to_map({_, Line, Value}, Type) ->
   #{type => Type, line => Line, value => Value}.
 
 def_body(Def, Statements) ->

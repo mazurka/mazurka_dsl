@@ -5,7 +5,7 @@ resource @root
 
 index() ->
   #{
-    account <- @users:read(Auth/OwnerID)
-    feeds <- @feeds:list()
-    post <- @posts:post()
+    account <- @users:read({1 2 3})
+    feeds <- @feeds:list([4 5 6])
+    post <- @posts:post(#{ok <- true})
   }.
