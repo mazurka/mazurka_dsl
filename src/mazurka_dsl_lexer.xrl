@@ -111,7 +111,7 @@ resource[\s]+@{Atom}+               :  {token, {def_begin,
                                                 TokenLine}}.
 
 %% assign
-<-                                  :  {token, {assign,
+<-                                  :  {token, {assignment,
                                                 TokenLine}}.
 
 %%% whitespace

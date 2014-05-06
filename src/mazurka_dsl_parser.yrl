@@ -3,7 +3,7 @@ Nonterminals
 defs def def_
 
 statements statement
-assignment assignment_
+assign assign_
 kvs kv kv_
 action action_ action_body action_body_
 
@@ -22,7 +22,7 @@ def_begin
 def_end
 
 %% statements
-assign
+assignment
 attr_begin
 action_def_body
 
@@ -66,19 +66,19 @@ def_ -> def_begin statements def_end : def_body('$1', '$2').
 statements -> statement : ['$1'].
 statements -> statement statements : ['$1' | '$2'].
 
-statement -> assignment : '$1'.
+statement -> assign : '$1'.
 statement -> action : '$1'.
 
 %%%% assignments
 
-assignment -> assignment_ : '$1'.
-assignment -> attrs assignment_ : set_attrs('$2', '$1').
-assignment -> docstring assignment_ : set_doc('$2', '$1').
-assignment -> docstring attrs assignment_ : set_attrs(set_doc('$3', '$1'), '$2').
+assign -> assign_ : '$1'.
+assign -> attrs assign_ : set_attrs('$2', '$1').
+assign -> docstring assign_ : set_doc('$2', '$1').
+assign -> docstring attrs assign_ : set_attrs(set_doc('$3', '$1'), '$2').
 
-assignment_ -> variable assign expr :
+assign_ -> variable assignment expr :
   #{
-    type => assignment,
+    type => assign,
     value => ?value('$1'),
     children => #{
       0 => '$3'
@@ -99,7 +99,7 @@ action_body -> action_body_ : ['$1'].
 action_body -> action_body_ action_body : ['$1' | '$2'].
 
 action_body_ -> expr : '$1'.
-action_body_ -> assignment : '$1'.
+action_body_ -> assign : '$1'.
 
 %%% attributes
 
@@ -149,7 +149,7 @@ expr_val -> string : to_map('$1', literal).
 expr_val -> comprehension : '$1'.
 
 comprehension ->
-  list_begin expr comp_sep assignment list_end :
+  list_begin expr comp_sep assign list_end :
   #{
     type => comprehension,
     line => ?line('$1'),
@@ -221,7 +221,7 @@ kv -> docstring kv_ : set_doc('$2', '$1').
 kv -> docstring attrs kv_ : set_attrs(set_doc('$3', '$1'), '$2').
 
 kv_ ->
-  atom assign expr :
+  atom assignment expr :
   #{
     type => kv,
     value => ?value('$1'),
@@ -237,9 +237,9 @@ call -> call_begin exprs call_or_affordance_end : call_body('$1', '$2', call).
 %%%% call with no arguments
 call -> call_begin call_or_affordance_end : call_body('$1', [], call).
 %%%% resource call with arguments
-call -> affordance_begin exprs call_or_affordance_end : call_body('$1', '$2', affordance).
+call -> affordance_begin exprs call_or_affordance_end : call_body('$1', '$2', call).
 %%%% resource call with no arguments
-call -> affordance_begin call_or_affordance_end : call_body('$1', [], affordance).
+call -> affordance_begin call_or_affordance_end : call_body('$1', [], call).
 
 Erlang code.
 
