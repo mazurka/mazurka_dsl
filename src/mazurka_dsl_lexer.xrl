@@ -11,7 +11,7 @@ C = ({U}|{L})
 Delim = [\s,]*
 
 Atom = [a-z][0-9a-zA-Z_]*
-Var = [A-Z_][0-9a-zA-Z_\/]*
+Var = [A-Z_][0-9a-zA-Z_]*
 Float = (\+|-)?[0-9]+\.[0-9]+((E|e)(\+|-)?[0-9]+)?
 
 Rules.
@@ -70,7 +70,10 @@ resource[\s]+@{Atom}+               :  {token, {def_begin,
 %%% variables
 {Var}                               :  {token, {variable,
                                                 TokenLine,
-                                                binary_to_atom(unicode(TokenChars))}}.
+                                                parse_variable(TokenChars)}}.
+{Var}\/{Var}                        :  {token, {variable,
+                                                TokenLine,
+                                                parse_variable(TokenChars)}}.
 %% datatypes
 
 %%% string
@@ -162,6 +165,14 @@ parse_fn_call(Str) ->
   case binary:split(Name, <<":">>) of
     [Mod,Fn] -> {binary_to_atom(trim(Mod)), binary_to_atom(trim(Fn))};
     _ -> binary_to_atom(trim(Name))
+  end.
+
+parse_variable(Str) ->
+  case string:tokens(Str, "/") of
+    [Var] ->
+      binary_to_atom(unicode(Var));
+    [NS, Var] ->
+      {binary_to_atom(unicode(NS)), binary_to_atom(unicode(Var))}
   end.
 
 trim(<<$\s, Rest/binary>>) ->

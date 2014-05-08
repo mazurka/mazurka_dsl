@@ -19,7 +19,7 @@
 {action_def_body,11}.
 {map_begin,12}.
 {atom,13,favorites}.
-{assign,13}.
+{assignment,13}.
 {list_begin,13}.
 {affordance_begin,13,{users,read}}.
 {variable,13,'Favorite'}.
@@ -27,12 +27,12 @@
 {comp_sep,13}.
 {comp_sep,13}.
 {variable,13,'Favorite'}.
-{assign,13}.
+{assignment,13}.
 {variable,13,'Favorites'}.
 {list_end,13}.
 {docstring,15,<<"\n    This is the length right here\n    ">>}.
 {atom,18,count}.
-{assign,18}.
+{assignment,18}.
 {call_begin,18,length}.
 {variable,18,'Favorites'}.
 {call_or_affordance_end,18}.

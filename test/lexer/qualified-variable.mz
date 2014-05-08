@@ -1,0 +1,5 @@
+Test <- Namespace/Variable
+
+#{
+  key <- NS/Var
+}
