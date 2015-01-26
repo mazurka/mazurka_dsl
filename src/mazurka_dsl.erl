@@ -3,11 +3,15 @@
 -export([parse/2]).
 -export([parse_file/2]).
 
-parse(Src, _Opts) ->
+parse(Src, Opts) ->
   case mazurka_dsl_lexer:string(Src) of
     {ok, Tokens, _} ->
-      {ok, Tokens2} = mazurka_dsl_parser_utils:insert_def_end(Tokens),
-      mazurka_dsl_parser:parse(Tokens2);
+      case mazurka_dsl_parser:parse(Tokens) of
+        {ok, Ast} ->
+          mazurka_dsl_compiler:compile(Ast, Opts);
+        Error ->
+          Error
+      end;
     Error ->
       Error
   end.

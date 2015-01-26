@@ -1,6 +1,0 @@
-{variable,2,'Users'}.
-{assignment,2}.
-{integer,2,123}.
-{variable,3,'Other'}.
-{assignment,3}.
-{atom,3,test}.

@@ -1,8 +1,0 @@
-{variable,1,'Test'}.
-{assignment,1}.
-{variable,1,{'Namespace','Variable'}}.
-{map_begin,3}.
-{atom,4,key}.
-{assignment,4}.
-{variable,4,{'NS','Var'}}.
-{map_or_tuple_end,5}.

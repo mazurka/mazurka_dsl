@@ -1,6 +1,0 @@
-resource @end_with_fn_call
-
-action(Inp Name) ->
-  Var1 <- users:get(Inp)
-  - redirect.
-  @other(Inp).
