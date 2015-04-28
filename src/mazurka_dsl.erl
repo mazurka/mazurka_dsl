@@ -20,7 +20,7 @@ parse_file(File, Opts) ->
   case read_file(File) of
     {ok, Src} ->
       parse(Src, Opts);
-     Error ->
+    Error ->
        Error
   end.
 
