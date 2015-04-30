@@ -3,7 +3,7 @@ defmodule MazurkaDsl.Mixfile do
 
   def project do
     [app: :mazurka_dsl,
-     version: "0.1.0",
+     version: "0.1.1",
      elixir: "~> 1.0",
      description: "DSL for defining mazurka resources",
      package: package,
