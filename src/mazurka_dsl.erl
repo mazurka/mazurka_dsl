@@ -6,9 +6,11 @@
 parse(Src, Opts) ->
   case mazurka_dsl_lexer:string(Src) of
     {ok, Tokens, _} ->
-      case mazurka_dsl_parser:parse(Tokens) of
+      case catch mazurka_dsl_parser:parse(Tokens) of
         {ok, Ast} ->
           mazurka_dsl_compiler:compile(Ast, Opts);
+        {'EXIT', Error} ->
+          Error;
         Error ->
           Error
       end;

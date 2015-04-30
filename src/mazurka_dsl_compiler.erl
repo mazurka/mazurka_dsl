@@ -76,7 +76,7 @@ scan_code([#{name := <<"code">>, children := CodeList, info := Parser, line := L
     <<>> -> DefaultParser;
     _ -> Parser
   end,
-  {Chosen, Code, Line, Rest}.
+  {Chosen, Code, Line + 1, Rest}.
 
 scan_parser([#{name := <<"p">>, children := [_, #{name := <<"a">>, children := NameList, props := Props}, _]} | Rest]) ->
   case format_text(NameList, []) of
